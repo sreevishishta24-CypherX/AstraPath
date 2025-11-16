@@ -1,5 +1,7 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { BellAlertIcon, ShieldCheckIcon, PhoneArrowDownLeftIcon } from './icons';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface HeaderProps {
     onSosClick: () => void;
@@ -9,6 +11,8 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onSosClick, onToggleCompanionMode, isCompanionModeActive, onFakeCallClick }) => {
+    const { t } = useTranslation();
+
     const companionButtonClasses = isCompanionModeActive
         ? "bg-green-600 hover:bg-green-700 shadow-green-900/50 hover:shadow-green-500/50"
         : "bg-gray-600 hover:bg-gray-700";
@@ -27,31 +31,32 @@ export const Header: React.FC<HeaderProps> = ({ onSosClick, onToggleCompanionMod
                     <h1 className="text-xl lg:text-2xl font-bold tracking-tight text-white">AstraPath</h1>
                 </div>
                 <div className="flex items-center gap-2 md:gap-4">
+                     <LanguageSwitcher />
                      <button
                         onClick={onFakeCallClick}
                         className="text-white font-bold py-2 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-lg transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 focus-visible:ring-blue-500 bg-gray-600 hover:bg-gray-700"
-                        aria-label="Initiate Fake Call"
-                        title="Initiate Fake Call"
+                        aria-label={t('header.fakeCall')}
+                        title={t('header.fakeCall')}
                     >
                         <PhoneArrowDownLeftIcon className="w-5 h-5" />
-                        <span className="hidden sm:inline font-semibold text-sm">Fake Call</span>
+                        <span className="hidden sm:inline font-semibold text-sm">{t('header.fakeCall')}</span>
                     </button>
                     <button
                         onClick={onToggleCompanionMode}
                         className={`text-white font-bold py-2 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-lg transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 focus-visible:ring-green-500 ${companionButtonClasses}`}
-                        aria-label={isCompanionModeActive ? "Deactivate Safe Companion Mode" : "Activate Safe Companion Mode"}
-                        title={isCompanionModeActive ? "Safe Companion is Active" : "Activate Safe Companion Mode"}
+                        aria-label={isCompanionModeActive ? t('header.deactivateCompanion') : t('header.activateCompanion')}
+                        title={isCompanionModeActive ? t('header.companionActive') : t('header.activateCompanion')}
                     >
                         <ShieldCheckIcon className={`w-5 h-5 ${companionPulseClass}`} />
-                        <span className="hidden sm:inline font-semibold text-sm">Companion</span>
+                        <span className="hidden sm:inline font-semibold text-sm">{t('header.companion')}</span>
                     </button>
                      <button 
                         onClick={onSosClick}
                         className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 shadow-lg shadow-red-900/50 hover:shadow-red-500/50 transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 focus-visible:ring-red-500"
-                        aria-label="Send SOS alert"
+                        aria-label={t('header.sos')}
                     >
                         <BellAlertIcon className="w-5 h-5" />
-                        <span className="font-semibold text-sm">SOS</span>
+                        <span className="font-semibold text-sm">{t('header.sos')}</span>
                     </button>
                 </div>
             </div>

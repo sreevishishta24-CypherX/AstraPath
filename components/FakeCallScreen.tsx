@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { PhoneXMarkIcon } from './icons';
 
 interface FakeCallScreenProps {
@@ -7,6 +8,8 @@ interface FakeCallScreenProps {
 }
 
 export const FakeCallScreen: React.FC<FakeCallScreenProps> = ({ isOpen, onEndCall }) => {
+    const { t } = useTranslation();
+
     if (!isOpen) return null;
 
     return (
@@ -18,10 +21,10 @@ export const FakeCallScreen: React.FC<FakeCallScreenProps> = ({ isOpen, onEndCal
             {/* Top Info */}
             <div className="text-center mt-12">
                 <div className="w-24 h-24 bg-indigo-500 rounded-full mx-auto flex items-center justify-center text-4xl font-bold mb-4">
-                    M
+                    {t('fakeCall.callerName').charAt(0)}
                 </div>
-                <h2 className="text-4xl font-semibold">Mom</h2>
-                <p className="text-lg text-gray-400 mt-1">Mobile</p>
+                <h2 className="text-4xl font-semibold">{t('fakeCall.callerName')}</h2>
+                <p className="text-lg text-gray-400 mt-1">{t('fakeCall.callerType')}</p>
             </div>
             
             {/* Bottom Controls */}
@@ -32,11 +35,11 @@ export const FakeCallScreen: React.FC<FakeCallScreenProps> = ({ isOpen, onEndCal
                          <button 
                             onClick={onEndCall}
                             className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center transform hover:scale-105 transition-transform"
-                            aria-label="Decline Call"
+                            aria-label={t('fakeCall.decline')}
                         >
                             <PhoneXMarkIcon className="w-10 h-10 text-white" />
                         </button>
-                        <span className="mt-2 text-sm">Decline</span>
+                        <span className="mt-2 text-sm">{t('fakeCall.decline')}</span>
                     </div>
                 </div>
             </div>

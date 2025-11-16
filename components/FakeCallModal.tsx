@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { FakeCallOptions, FakeCallVoice, FakeCallTone } from '../types';
 import { PhoneArrowDownLeftIcon } from './icons';
 
@@ -8,14 +9,10 @@ interface FakeCallModalProps {
     onCancel: () => void;
 }
 
-const SCENARIOS = [
-    "I'm waiting outside, come fast.",
-    "Your cab is nearby, please come down now.",
-    "Hey, are you done? I'm getting late and need to leave.",
-    "The movie is about to start, where are you?"
-];
-
 export const FakeCallModal: React.FC<FakeCallModalProps> = ({ isOpen, onStart, onCancel }) => {
+    const { t } = useTranslation();
+    const SCENARIOS = t('fakeCall.scenarios', { returnObjects: true }) as string[];
+
     const [voice, setVoice] = useState<FakeCallVoice>('female');
     const [tone, setTone] = useState<FakeCallTone>('calm');
     const [message, setMessage] = useState<string>(SCENARIOS[0]);
@@ -49,29 +46,29 @@ export const FakeCallModal: React.FC<FakeCallModalProps> = ({ isOpen, onStart, o
                             <PhoneArrowDownLeftIcon className="h-6 w-6 text-indigo-400" />
                         </div>
                         <h3 className="text-lg font-bold leading-6 text-white" id="modal-title">
-                            Setup Smart Fake Call
+                            {t('fakeCall.title')}
                         </h3>
                     </div>
                     
                     <div className="space-y-5">
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Voice</label>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">{t('fakeCall.voice')}</label>
                             <div className="grid grid-cols-2 gap-3">
-                                <OptionButton onClick={() => setVoice('female')} isActive={voice === 'female'}>Female</OptionButton>
-                                <OptionButton onClick={() => setVoice('male')} isActive={voice === 'male'}>Male</OptionButton>
+                                <OptionButton onClick={() => setVoice('female')} isActive={voice === 'female'}>{t('fakeCall.female')}</OptionButton>
+                                <OptionButton onClick={() => setVoice('male')} isActive={voice === 'male'}>{t('fakeCall.male')}</OptionButton>
                             </div>
                         </div>
                         
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-2">Tone</label>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">{t('fakeCall.tone')}</label>
                             <div className="grid grid-cols-2 gap-3">
-                                <OptionButton onClick={() => setTone('calm')} isActive={tone === 'calm'}>Calm</OptionButton>
-                                <OptionButton onClick={() => setTone('urgent')} isActive={tone === 'urgent'}>Urgent</OptionButton>
+                                <OptionButton onClick={() => setTone('calm')} isActive={tone === 'calm'}>{t('fakeCall.calm')}</OptionButton>
+                                <OptionButton onClick={() => setTone('urgent')} isActive={tone === 'urgent'}>{t('fakeCall.urgent')}</OptionButton>
                             </div>
                         </div>
 
                         <div>
-                             <label className="block text-sm font-medium text-gray-300 mb-2">Scenario</label>
+                             <label className="block text-sm font-medium text-gray-300 mb-2">{t('fakeCall.scenario')}</label>
                              <select 
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
@@ -91,14 +88,14 @@ export const FakeCallModal: React.FC<FakeCallModalProps> = ({ isOpen, onStart, o
                         className="w-full justify-center rounded-md bg-gray-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 sm:w-auto transition-colors"
                         onClick={onCancel}
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </button>
                     <button
                         type="button"
                         className="w-full justify-center rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 sm:w-auto transition-colors"
                         onClick={handleStart}
                     >
-                        Start Call
+                        {t('fakeCall.startButton')}
                     </button>
                 </div>
             </div>

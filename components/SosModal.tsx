@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ExclamationTriangleIcon } from './icons';
 
 interface SosModalProps {
@@ -9,6 +10,7 @@ interface SosModalProps {
 }
 
 export const SosModal: React.FC<SosModalProps> = ({ isOpen, onConfirm, onCancel, location }) => {
+    const { t } = useTranslation();
     if (!isOpen) return null;
 
     return (
@@ -21,14 +23,14 @@ export const SosModal: React.FC<SosModalProps> = ({ isOpen, onConfirm, onCancel,
                         </div>
                         <div className="flex-grow text-left">
                             <h3 className="text-lg font-bold leading-6 text-white" id="modal-title">
-                                Confirm SOS Alert
+                                {t('sosModal.title')}
                             </h3>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-300">
-                                    You are about to send an emergency alert. This action is irreversible and should only be used in a genuine emergency.
+                                    {t('sosModal.description')}
                                 </p>
                                 <p className="mt-3 text-sm text-gray-400 bg-gray-900/50 p-2 rounded-md">
-                                    Your current location will be sent: <br/>
+                                    {t('sosModal.locationNotice')} <br/>
                                     <span className="font-mono text-indigo-300">Lat: {location.lat.toFixed(6)}, Lng: {location.lng.toFixed(6)}</span>
                                 </p>
                             </div>
@@ -41,14 +43,14 @@ export const SosModal: React.FC<SosModalProps> = ({ isOpen, onConfirm, onCancel,
                         className="w-full justify-center rounded-md bg-gray-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 sm:w-auto transition-colors"
                         onClick={onCancel}
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </button>
                     <button
                         type="button"
                         className="w-full justify-center rounded-md bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-auto transition-colors"
                         onClick={onConfirm}
                     >
-                        Confirm Alert
+                        {t('sosModal.confirmButton')}
                     </button>
                 </div>
             </div>

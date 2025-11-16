@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RouteData, MapView } from '../types';
 
 // Declare Leaflet in the global scope to avoid TypeScript errors
@@ -37,6 +38,7 @@ const iconMapping = {
 };
 
 export const MapDisplay: React.FC<MapDisplayProps> = ({ routeData, mapView, setMapView }) => {
+    const { t } = useTranslation();
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<any>(null);
     const routeLayerRef = useRef<any>(null);
@@ -86,8 +88,8 @@ export const MapDisplay: React.FC<MapDisplayProps> = ({ routeData, mapView, setM
             const latLngs = routeData.path.map(p => [p.lat, p.lng]);
             L.polyline(latLngs, { color: 'var(--accent-primary)', weight: 6, opacity: 0.8 }).addTo(newRouteLayer);
 
-            L.circleMarker(latLngs[0], { radius: 8, color: 'white', fillColor: '#10b981', fillOpacity: 1, weight: 2 }).addTo(newRouteLayer).bindPopup('<b>Start</b>');
-            L.circleMarker(latLngs[latLngs.length - 1], { radius: 8, color: 'white', fillColor: '#ef4444', fillOpacity: 1, weight: 2 }).addTo(newRouteLayer).bindPopup('<b>End</b>');
+            L.circleMarker(latLngs[0], { radius: 8, color: 'white', fillColor: '#10b981', fillOpacity: 1, weight: 2 }).addTo(newRouteLayer).bindPopup(`<b>${t('map.start')}</b>`);
+            L.circleMarker(latLngs[latLngs.length - 1], { radius: 8, color: 'white', fillColor: '#ef4444', fillOpacity: 1, weight: 2 }).addTo(newRouteLayer).bindPopup(`<b>${t('map.end')}</b>`);
 
             const markersToAdd = mapView === 'safety' ? safetyMarkers : roadIssueMarkers;
             markersToAdd.forEach(marker => marker.addTo(newRouteLayer));
@@ -100,15 +102,15 @@ export const MapDisplay: React.FC<MapDisplayProps> = ({ routeData, mapView, setM
         } else {
              map.setView([20.5937, 78.9629], 5);
         }
-    }, [routeData, mapView, safetyMarkers, roadIssueMarkers]);
+    }, [routeData, mapView, safetyMarkers, roadIssueMarkers, t]);
 
     return (
         <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700/50 flex flex-col h-full w-full p-2">
             <div className="flex items-center justify-between mb-2 px-2 pt-1">
-                 <h2 className="text-lg font-bold text-white">Route Visualization</h2>
+                 <h2 className="text-lg font-bold text-white">{t('map.title')}</h2>
                  <div className="flex p-1 bg-gray-900/70 rounded-lg">
-                    <button onClick={() => setMapView('safety')} className={`px-4 py-1 text-sm rounded-md transition-colors duration-200 font-semibold ${mapView === 'safety' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700/50'}`}>Safety</button>
-                    <button onClick={() => setMapView('roadCondition')} className={`px-4 py-1 text-sm rounded-md transition-colors duration-200 font-semibold ${mapView === 'roadCondition' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700/50'}`}>Road Issues</button>
+                    <button onClick={() => setMapView('safety')} className={`px-4 py-1 text-sm rounded-md transition-colors duration-200 font-semibold ${mapView === 'safety' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700/50'}`}>{t('map.safety')}</button>
+                    <button onClick={() => setMapView('roadCondition')} className={`px-4 py-1 text-sm rounded-md transition-colors duration-200 font-semibold ${mapView === 'roadCondition' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700/50'}`}>{t('map.roadIssues')}</button>
                 </div>
             </div>
             <div ref={mapContainerRef} className="flex-grow w-full rounded-lg overflow-hidden relative">
@@ -118,8 +120,8 @@ export const MapDisplay: React.FC<MapDisplayProps> = ({ routeData, mapView, setM
                              <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 16.382V5.618a1 1 0 00-1.447-.894L15 7m-6 3v3m6-3v3" />
                             </svg>
-                            <p className="mt-2 text-lg font-semibold text-gray-400">Your route will appear here</p>
-                            <p className="text-sm text-gray-500">Enter a start and end point to begin.</p>
+                            <p className="mt-2 text-lg font-semibold text-gray-400">{t('map.placeholderTitle')}</p>
+                            <p className="text-sm text-gray-500">{t('map.placeholderSubtitle')}</p>
                         </div>
                     </div>
                 )}

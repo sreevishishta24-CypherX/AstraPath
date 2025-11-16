@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { TransportMode } from '../types';
 import { CarIcon, BikeIcon, WalkIcon, LocationMarkerIcon, StartIcon, EndIcon } from './icons';
 
@@ -8,6 +9,7 @@ interface RouteInputFormProps {
 }
 
 export const RouteInputForm: React.FC<RouteInputFormProps> = ({ onFindRoute, isLoading }) => {
+    const { t } = useTranslation();
     const [start, setStart] = useState('');
     const [end, setEnd] = useState('');
     const [mode, setMode] = useState<TransportMode>('walking');
@@ -22,20 +24,20 @@ export const RouteInputForm: React.FC<RouteInputFormProps> = ({ onFindRoute, isL
                     setIsGettingLocation(false);
                 },
                 (error) => {
-                    let message = "Could not retrieve your location. Please ensure location services are enabled and permissions are granted in your browser settings.";
+                    let messageKey = 'alerts.locationGenericError';
                     switch(error.code) {
                         case error.PERMISSION_DENIED:
-                            message = "Location permission denied. Please enable it in your browser settings to use this feature.";
+                            messageKey = 'alerts.locationPermissionDenied';
                             break;
                         case error.POSITION_UNAVAILABLE:
-                            message = "Location information is currently unavailable. Please check your device's GPS or try again.";
+                            messageKey = 'alerts.locationUnavailable';
                             break;
                         case error.TIMEOUT:
-                            message = "The request to get your location timed out. Please try again.";
+                            messageKey = 'alerts.locationTimeout';
                             break;
                     }
                     console.error("Error getting location: ", error.message);
-                    alert(message);
+                    alert(t(messageKey));
                     setIsGettingLocation(false);
                 },
                 {
@@ -45,7 +47,7 @@ export const RouteInputForm: React.FC<RouteInputFormProps> = ({ onFindRoute, isL
                 }
             );
         } else {
-            alert("Geolocation is not supported by this browser.");
+            alert(t('alerts.geolocationNotSupported'));
         }
     };
     
@@ -65,7 +67,7 @@ export const RouteInputForm: React.FC<RouteInputFormProps> = ({ onFindRoute, isL
                         type="text"
                         value={start}
                         onChange={(e) => setStart(e.target.value)}
-                        placeholder="Starting point"
+                        placeholder={t('routeInput.startPlaceholder')}
                         className="w-full bg-gray-700/50 text-white p-3 pl-10 rounded-lg border-2 border-transparent focus:border-indigo-500 focus:ring-0 transition"
                         disabled={isLoading}
                     />
@@ -74,7 +76,7 @@ export const RouteInputForm: React.FC<RouteInputFormProps> = ({ onFindRoute, isL
                         onClick={handleGeolocation} 
                         disabled={isLoading || isGettingLocation} 
                         className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-indigo-400 transition-colors p-1.5 rounded-full hover:bg-gray-700 disabled:cursor-wait disabled:text-indigo-400"
-                        title="Use current location"
+                        title={t('routeInput.useCurrentLocation')}
                     >
                         {isGettingLocation ? (
                             <svg className="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -94,7 +96,7 @@ export const RouteInputForm: React.FC<RouteInputFormProps> = ({ onFindRoute, isL
                         type="text"
                         value={end}
                         onChange={(e) => setEnd(e.target.value)}
-                        placeholder="Destination"
+                        placeholder={t('routeInput.endPlaceholder')}
                         className="w-full bg-gray-700/50 text-white p-3 pl-10 rounded-lg border-2 border-transparent focus:border-indigo-500 focus:ring-0 transition"
                         disabled={isLoading}
                     />
@@ -112,7 +114,7 @@ export const RouteInputForm: React.FC<RouteInputFormProps> = ({ onFindRoute, isL
                                 {transportMode === 'walking' && <WalkIcon />}
                                 {transportMode === 'bike' && <BikeIcon />}
                                 {transportMode === 'car' && <CarIcon />}
-                                <span className={`text-xs font-semibold mt-1 capitalize`}>{transportMode}</span>
+                                <span className={`text-xs font-semibold mt-1 capitalize`}>{t(`routeInput.modes.${transportMode}`)}</span>
                             </button>
                         );
                     })}
@@ -128,10 +130,10 @@ export const RouteInputForm: React.FC<RouteInputFormProps> = ({ onFindRoute, isL
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            Finding Route...
+                            {t('routeInput.loadingButton')}
                         </>
                     ) : (
-                        'Find Route'
+                        t('routeInput.submitButton')
                     )}
                 </button>
             </form>

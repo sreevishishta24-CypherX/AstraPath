@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Header } from './components/Header';
 import { RouteInputForm } from './components/RouteInputForm';
 import { MapDisplay } from './components/MapDisplay';
@@ -20,6 +21,7 @@ declare global {
 }
 
 const App: React.FC = () => {
+    const { t, i18n } = useTranslation();
     const [routeData, setRouteData] = useState<RouteData | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -58,7 +60,7 @@ const App: React.FC = () => {
 
     const handleFindRoute = useCallback(async (start: string, end: string, mode: TransportMode) => {
         if (!start || !end) {
-            setError("Please enter both a starting point and a destination.");
+            setError(t('alerts.enterStartAndEnd'));
             return;
         }
         setIsLoading(true);
@@ -70,11 +72,11 @@ const App: React.FC = () => {
             setRouteData(data);
         } catch (e) {
             console.error(e);
-            setError("Sorry, we couldn't generate a route. The model may be unavailable or the request was invalid. Please try again.");
+            setError(t('alerts.routeGenerationError'));
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [t]);
     
     const handleSosClick = () => {
         if (navigator.geolocation) {
@@ -87,11 +89,11 @@ const App: React.FC = () => {
                     setShowSosModal(true);
                 },
                 () => {
-                    alert("Could not retrieve your location. Please enable location services to use the SOS feature.");
+                    alert(t('alerts.locationRetrievalError'));
                 }
             );
         } else {
-            alert("Geolocation is not supported by this browser.");
+            alert(t('alerts.geolocationNotSupported'));
         }
     };
 
@@ -141,13 +143,13 @@ const App: React.FC = () => {
             recognitionRef.current = new SpeechRecognition();
             recognitionRef.current.continuous = true;
             recognitionRef.current.interimResults = true;
-            recognitionRef.current.lang = 'en-US';
+            recognitionRef.current.lang = i18n.language;
 
             recognitionRef.current.onresult = (event: any) => {
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         const transcript = event.results[i][0].transcript.toLowerCase().trim();
-                        const keywords = ["help", "stop", "leave me"];
+                        const keywords = t('companionMode.keywords', { returnObjects: true }) as string[];
                         if (keywords.some(keyword => transcript.includes(keyword))) {
                             handleDistressSignal();
                         }
@@ -176,7 +178,7 @@ const App: React.FC = () => {
                 }
                 if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
                     setIsCompanionModeActive(false);
-                    alert("Microphone permission denied. Safe Companion mode has been disabled.");
+                    alert(t('alerts.micPermissionDenied'));
                 }
             };
             
@@ -186,7 +188,7 @@ const App: React.FC = () => {
                 console.error("Failed to start speech recognition:", e);
                 if (e.name !== 'InvalidStateError') {
                     setIsCompanionModeActive(false);
-                    alert("Could not start Safe Companion mode. Please try again.");
+                    alert(t('alerts.companionStartError'));
                 }
             }
         } else {
@@ -203,7 +205,7 @@ const App: React.FC = () => {
                 recognitionRef.current.stop();
             }
         };
-    }, [isCompanionModeActive, handleDistressSignal]);
+    }, [isCompanionModeActive, handleDistressSignal, t, i18n.language]);
 
     const handleToggleCompanionMode = () => {
         if (isCompanionModeActive) {
@@ -221,7 +223,7 @@ const App: React.FC = () => {
                 setIsCompanionModeActive(true);
             })
             .catch(() => {
-                alert("Microphone and Camera permissions are required for Safe Companion mode.");
+                alert(t('alerts.micCamPermissionRequired'));
             });
     };
     
@@ -265,16 +267,25 @@ const App: React.FC = () => {
         const desiredVoice = voices.find(voice => {
             const name = voice.name.toLowerCase();
             const lang = voice.lang.toLowerCase();
-            if (options.voice === 'female') {
-                return (name.includes('female') || name.includes('zira') || name.includes('samantha') || name.includes('susan')) && (lang.includes('en'));
-            } else { // male
-                return (name.includes('male') || name.includes('david') || name.includes('mark') || name.includes('tom')) && (lang.includes('en'));
-            }
+            const currentLang = i18n.language.split('-')[0];
+
+            const femaleKeywords = ['female', 'zira', 'samantha', 'susan', 'femme', 'mujer', 'महिला'];
+            const maleKeywords = ['male', 'david', 'mark', 'tom', 'homme', 'hombre', 'पुरुष'];
+
+            const keywords = options.voice === 'female' ? femaleKeywords : maleKeywords;
+
+            return keywords.some(kw => name.includes(kw)) && lang.includes(currentLang);
         });
         
         if (desiredVoice) {
             utterance.voice = desiredVoice;
+        } else {
+             // Fallback for current language if specific gender not found
+            const fallbackVoice = voices.find(voice => voice.lang.split('-')[0] === i18n.language.split('-')[0]);
+            if (fallbackVoice) utterance.voice = fallbackVoice;
         }
+        utterance.lang = i18n.language;
+
 
         if (options.tone === 'urgent') {
             utterance.pitch = 1.2; // Higher pitch
@@ -307,16 +318,16 @@ const App: React.FC = () => {
                 isCompanionModeActive={isCompanionModeActive}
                 onFakeCallClick={handleFakeCallClick}
             />
-            <main className="flex-grow flex flex-col md:flex-row gap-6 p-4 lg:p-8 overflow-hidden">
+            <main className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-6 p-4 lg:p-8 overflow-hidden">
                 {/* Left Column */}
-                <div className="w-full md:w-[420px] lg:w-[450px] flex-shrink-0 flex flex-col gap-6 overflow-hidden">
+                <div className="md:col-span-5 lg:col-span-4 xl:col-span-3 flex flex-col gap-6 overflow-y-auto">
                     <RouteInputForm onFindRoute={handleFindRoute} isLoading={isLoading} />
-                    <div className="flex-grow flex flex-col overflow-hidden">
+                    <div className="flex-grow flex flex-col overflow-hidden min-h-0">
                       <RouteDetails routeData={routeData} isLoading={isLoading} error={error} />
                     </div>
                 </div>
                 {/* Right Column */}
-                <div className="flex-grow flex flex-col min-h-[400px] md:min-h-0 overflow-hidden">
+                <div className="md:col-span-7 lg:col-span-8 xl:col-span-9 min-h-[400px] md:min-h-0">
                     <MapDisplay routeData={routeData} mapView={mapView} setMapView={setMapView} />
                 </div>
             </main>

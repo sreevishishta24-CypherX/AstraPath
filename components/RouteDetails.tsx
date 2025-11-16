@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RouteData, SafetyPoint, RouteStep } from '../types';
 import { PoliceIcon, LowCrimeIcon, WellLitIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, MinusIcon, ExclamationTriangleIcon, FlagIcon } from './icons';
 
@@ -29,6 +30,7 @@ const TrendIcon: React.FC<{ trend: SafetyPoint['historicalTrend'] }> = ({ trend 
 };
 
 const ReportForm: React.FC<{ onReport: (type: 'safety' | 'road', description: string) => void, onCancel: () => void }> = ({ onReport, onCancel }) => {
+    const { t } = useTranslation();
     const [type, setType] = useState<'safety' | 'road'>('safety');
     const [description, setDescription] = useState('');
 
@@ -42,26 +44,27 @@ const ReportForm: React.FC<{ onReport: (type: 'safety' | 'road', description: st
     return (
         <form onSubmit={handleSubmit} className="mt-3 p-3 bg-gray-900/50 rounded-lg space-y-2 animate-fade-in">
             <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => setType('safety')} className={`px-3 py-1.5 text-xs font-semibold rounded-md transition ${type === 'safety' ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>Safety Concern</button>
-                <button type="button" onClick={() => setType('road')} className={`px-3 py-1.5 text-xs font-semibold rounded-md transition ${type === 'road' ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>Road Issue</button>
+                <button type="button" onClick={() => setType('safety')} className={`px-3 py-1.5 text-xs font-semibold rounded-md transition ${type === 'safety' ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>{t('routeDetails.report.safetyConcern')}</button>
+                <button type="button" onClick={() => setType('road')} className={`px-3 py-1.5 text-xs font-semibold rounded-md transition ${type === 'road' ? 'bg-indigo-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>{t('routeDetails.report.roadIssue')}</button>
             </div>
             <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Briefly describe the issue..."
+                placeholder={t('routeDetails.report.descriptionPlaceholder')}
                 className="w-full bg-gray-700/50 text-white p-2 text-sm rounded-md border-2 border-transparent focus:border-indigo-500 focus:ring-0 transition"
                 rows={2}
                 required
             />
             <div className="flex justify-end gap-2">
-                <button type="button" onClick={onCancel} className="px-3 py-1.5 text-xs font-semibold rounded-md bg-gray-600 hover:bg-gray-500 transition">Cancel</button>
-                <button type="submit" className="px-3 py-1.5 text-xs font-semibold rounded-md bg-indigo-600 hover:bg-indigo-500 transition">Submit</button>
+                <button type="button" onClick={onCancel} className="px-3 py-1.5 text-xs font-semibold rounded-md bg-gray-600 hover:bg-gray-500 transition">{t('common.cancel')}</button>
+                <button type="submit" className="px-3 py-1.5 text-xs font-semibold rounded-md bg-indigo-600 hover:bg-indigo-500 transition">{t('common.submit')}</button>
             </div>
         </form>
     );
 }
 
 const DirectionStep: React.FC<{ step: RouteStep, index: number, isLast: boolean }> = ({ step, index, isLast }) => {
+    const { t } = useTranslation();
     const [isReporting, setIsReporting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -99,25 +102,27 @@ const DirectionStep: React.FC<{ step: RouteStep, index: number, isLast: boolean 
                     <p className="text-xs text-gray-400 mt-0.5">{step.distance}</p>
                 </div>
                 {!isReporting && !isSubmitted && (
-                     <button onClick={() => setIsReporting(true)} className="flex-shrink-0 text-gray-500 hover:text-indigo-400 transition ml-2 p-1 rounded-full hover:bg-gray-700" title="Report an issue">
+                     <button onClick={() => setIsReporting(true)} className="flex-shrink-0 text-gray-500 hover:text-indigo-400 transition ml-2 p-1 rounded-full hover:bg-gray-700" title={t('routeDetails.report.reportIssue')}>
                         <FlagIcon className="w-4 h-4" />
                     </button>
                 )}
             </div>
             {isReporting && <ReportForm onReport={handleReport} onCancel={() => setIsReporting(false)} />}
-            {isSubmitted && <p className="text-xs text-green-400 mt-2 animate-fade-in">Report submitted. Thank you!</p>}
+            {isSubmitted && <p className="text-xs text-green-400 mt-2 animate-fade-in">{t('routeDetails.report.reportSubmitted')}</p>}
         </li>
     );
 };
 
 
 export const RouteDetails: React.FC<RouteDetailsProps> = ({ routeData, isLoading, error }) => {
+    const { t } = useTranslation();
+
     if (isLoading) {
         return (
              <div className="bg-gray-800 p-4 rounded-xl shadow-2xl border border-gray-700/50 flex-grow flex flex-col items-center justify-center text-center">
                  <div className="w-12 h-12 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-                 <h3 className="text-lg font-semibold">Crafting Your Route...</h3>
-                 <p className="text-sm text-gray-400">Our AI is analyzing safety data and road conditions to find you the best path.</p>
+                 <h3 className="text-lg font-semibold">{t('routeDetails.loading.title')}</h3>
+                 <p className="text-sm text-gray-400">{t('routeDetails.loading.subtitle')}</p>
              </div>
         );
     }
@@ -125,7 +130,7 @@ export const RouteDetails: React.FC<RouteDetailsProps> = ({ routeData, isLoading
     if (error) {
         return (
             <div className="bg-gray-800 p-4 rounded-xl shadow-2xl border border-gray-700/50 flex-grow text-red-400">
-                <h3 className="font-bold mb-2">Error</h3>
+                <h3 className="font-bold mb-2">{t('common.error')}</h3>
                 <p>{error}</p>
             </div>
         );
@@ -138,24 +143,24 @@ export const RouteDetails: React.FC<RouteDetailsProps> = ({ routeData, isLoading
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                 </svg>
-                <h3 className="text-lg font-semibold">Ready to Go?</h3>
-                 <p className="text-sm text-gray-400">Fill in your journey details above.</p>
+                <h3 className="text-lg font-semibold">{t('routeDetails.placeholder.title')}</h3>
+                 <p className="text-sm text-gray-400">{t('routeDetails.placeholder.subtitle')}</p>
             </div>
         );
     }
 
     return (
         <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700/50 flex-grow flex flex-col overflow-hidden">
-             <h3 className="text-lg font-bold p-4 border-b border-gray-700/50 flex-shrink-0 text-white">Route Details</h3>
+             <h3 className="text-lg font-bold p-4 border-b border-gray-700/50 flex-shrink-0 text-white">{t('routeDetails.title')}</h3>
             <div className="flex-grow overflow-y-auto p-4 space-y-6">
                  <div className="bg-gray-900/50 p-4 rounded-lg border border-gray-700/50">
-                    <p className="font-semibold text-indigo-300 text-sm mb-1">Overview</p>
+                    <p className="font-semibold text-indigo-300 text-sm mb-1">{t('routeDetails.overview')}</p>
                     <p className="text-sm">{routeData.overview}</p>
                 </div>
             
                 {routeData.safetyPoints && routeData.safetyPoints.length > 0 && (
                     <div>
-                        <h4 className="text-base font-semibold mb-3 text-indigo-300">Safety Insights</h4>
+                        <h4 className="text-base font-semibold mb-3 text-indigo-300">{t('routeDetails.safetyInsights')}</h4>
                         <ul className="space-y-3">
                             {routeData.safetyPoints.map((point, index) => (
                                 <li key={index} className="p-3 bg-gray-900/50 rounded-lg text-sm border border-gray-700/50">
@@ -173,13 +178,13 @@ export const RouteDetails: React.FC<RouteDetailsProps> = ({ routeData, isLoading
                                                         point.historicalTrend === 'Declining' ? 'text-red-400' : ''
                                                     }`}>
                                                         <TrendIcon trend={point.historicalTrend} />
-                                                        <span>{point.historicalTrend} Trend</span>
+                                                        <span>{t(`routeDetails.trends.${point.historicalTrend.toLowerCase()}`)} {t('routeDetails.trends.trend')}</span>
                                                     </span>
                                                 )}
                                                 {(point.userReports ?? 0) > 0 && (
                                                     <span className="flex items-center gap-1.5 text-yellow-400">
                                                         <ExclamationTriangleIcon className="w-4 h-4" />
-                                                        <span>{point.userReports} recent report(s)</span>
+                                                        <span>{point.userReports} {t('routeDetails.recentReports', { count: point.userReports })}</span>
                                                     </span>
                                                 )}
                                             </div>
@@ -192,7 +197,7 @@ export const RouteDetails: React.FC<RouteDetailsProps> = ({ routeData, isLoading
                 )}
 
                 <div>
-                    <h4 className="text-base font-semibold mb-3 text-indigo-300">Directions</h4>
+                    <h4 className="text-base font-semibold mb-3 text-indigo-300">{t('routeDetails.directions')}</h4>
                      <ul className="list-none">
                         {routeData.steps.map((step, index) => (
                            <DirectionStep

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ShieldCheckIcon } from './icons';
 
 interface CompanionModeModalProps {
@@ -8,7 +9,11 @@ interface CompanionModeModalProps {
 }
 
 export const CompanionModeModal: React.FC<CompanionModeModalProps> = ({ isOpen, onConfirm, onCancel }) => {
+    const { t } = useTranslation();
     if (!isOpen) return null;
+
+    const keywords = t('companionMode.keywords', { returnObjects: true }) as string[];
+    const actions = t('companionMode.actions', { returnObjects: true }) as string[];
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] flex items-center justify-center p-4" aria-modal="true" role="dialog">
@@ -20,30 +25,26 @@ export const CompanionModeModal: React.FC<CompanionModeModalProps> = ({ isOpen, 
                         </div>
                         <div className="mt-4">
                             <h3 className="text-xl font-bold leading-6 text-white" id="modal-title">
-                                Activate Safe Companion Mode?
+                                {t('companionMode.title')}
                             </h3>
                             <div className="mt-4 space-y-3 text-sm text-gray-300">
                                 <p>
-                                    When activated, AstraPath will use your device's microphone to listen for distress keywords. This feature is designed to provide hands-free help in an emergency.
+                                    {t('companionMode.description')}
                                 </p>
                                 <div className="text-left bg-gray-900/50 p-4 rounded-lg">
-                                    <p className="font-semibold text-indigo-300">It will listen for keywords like:</p>
+                                    <p className="font-semibold text-indigo-300">{t('companionMode.listensFor')}</p>
                                     <ul className="list-disc list-inside mt-2 text-gray-400">
-                                        <li>"Help"</li>
-                                        <li>"Stop"</li>
-                                        <li>"Leave me"</li>
+                                        {keywords.map((keyword, index) => <li key={index}>{keyword}</li>)}
                                     </ul>
                                 </div>
                                 <div className="text-left bg-gray-900/50 p-4 rounded-lg">
-                                    <p className="font-semibold text-red-400">If a keyword is detected, it will automatically:</p>
+                                    <p className="font-semibold text-red-400">{t('companionMode.ifDetected')}</p>
                                     <ul className="list-disc list-inside mt-2 text-gray-400">
-                                        <li>Share your live location with authorities.</li>
-                                        <li>Start recording audio and video.</li>
-                                        <li>Initiate a call to emergency services (112).</li>
+                                       {actions.map((action, index) => <li key={index}>{action}</li>)}
                                     </ul>
                                 </div>
                                 <p className="text-xs text-gray-500 pt-2">
-                                    This feature requires microphone and camera permissions to function. Your privacy is important; audio is processed on-device and is not stored unless a distress signal is confirmed.
+                                    {t('companionMode.privacyNotice')}
                                 </p>
                             </div>
                         </div>
@@ -55,14 +56,14 @@ export const CompanionModeModal: React.FC<CompanionModeModalProps> = ({ isOpen, 
                         className="w-full justify-center rounded-md bg-gray-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 sm:w-auto transition-colors"
                         onClick={onCancel}
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </button>
                     <button
                         type="button"
                         className="w-full justify-center rounded-md bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 sm:w-auto transition-colors"
                         onClick={onConfirm}
                     >
-                        Activate Mode
+                        {t('companionMode.activateButton')}
                     </button>
                 </div>
             </div>

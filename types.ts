@@ -55,3 +55,10 @@ export interface FakeCallOptions {
   tone: FakeCallTone;
   message: string;
 }
+
+// Type for Language Switcher
+export interface Language {
+  code: string;
+  name: string;
+  nativeName: string;
+}
